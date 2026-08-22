@@ -8,9 +8,11 @@ Cliquez le gros citron, embauchez des mamies, plantez des vergers, puis partez c
 
 **[https://quirky-beaver-428.harvis.page](https://quirky-beaver-428.harvis.page)**
 
-## Lancer en local
+## Cloner chez soi
 
 ```bash
+git clone https://github.com/KevTale/citron-clicker.git
+cd citron-clicker
 npm install
 npm run dev
 ```
