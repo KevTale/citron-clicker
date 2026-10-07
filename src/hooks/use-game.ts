@@ -14,6 +14,7 @@ import {
   serializeState,
   tick,
 } from "@/lib/game/engine";
+import { formatNumber, lemonWord } from "@/lib/game/format";
 import { SAVE_KEY, type BuildingId, type BuyMode, type GameState } from "@/lib/game/types";
 
 export interface FloatingGain {
@@ -66,7 +67,8 @@ export function useGame() {
       setState(initial);
       setNow(Date.now());
       if (offline > 0) {
-        pushNotice(`Pendant votre absence : +${Math.floor(offline).toLocaleString("fr-FR")} citrons.`);
+        const earned = Math.floor(offline);
+        pushNotice(`Pendant votre absence : +${formatNumber(earned)} ${lemonWord(earned)}.`);
       }
     }, 0);
     return () => window.clearTimeout(timer);
