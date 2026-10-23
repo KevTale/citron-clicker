@@ -312,3 +312,43 @@ export function parseState(raw: string | null): GameState | null {
     return null;
   }
 }
+
+const isFiniteNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
+
+const GOLDEN_KINDS: readonly GoldenLemon["kind"][] = ["lucky", "frenzy", "clickFrenzy"];
+
+/** Stricter than parseState: rejects saves whose fields would break the game. */
+export function isPlayableState(state: GameState): boolean {
+  const numbers = [
+    state.lemons,
+    state.totalLemons,
+    state.handmadeLemons,
+    state.clicks,
+    state.startedAt,
+    state.lastSavedAt,
+    state.frenzyUntil,
+    state.clickFrenzyUntil,
+    state.nextGoldenAt,
+    state.newsIndex,
+  ];
+  if (!numbers.every(isFiniteNumber)) return false;
+  const buildings = state.buildings as unknown;
+  if (typeof buildings !== "object" || buildings === null || Array.isArray(buildings)) return false;
+  const entries = Object.entries(buildings);
+  if (entries.length !== BUILDING_IDS.length) return false;
+  const known: readonly string[] = BUILDING_IDS;
+  if (!entries.every(([id, count]) => known.includes(id) && Number.isInteger(count) && count >= 0)) {
+    return false;
+  }
+  const golden = state.golden as unknown;
+  if (golden === null) return true;
+  if (typeof golden !== "object") return false;
+  const { x, y, expiresAt, kind } = golden as Partial<GoldenLemon>;
+  return (
+    isFiniteNumber(x) &&
+    isFiniteNumber(y) &&
+    isFiniteNumber(expiresAt) &&
+    GOLDEN_KINDS.includes(kind as GoldenLemon["kind"])
+  );
+}

@@ -48,7 +48,7 @@ export function GameApp() {
       {state.golden ? <GoldenLemon golden={state.golden} onClick={game.onGolden} /> : null}
 
       {game.notices.length > 0 ? (
-        <div className="pointer-events-none absolute top-4 right-4 z-40 flex w-72 flex-col gap-2">
+        <div className="pointer-events-none absolute top-4 right-4 z-[60] flex w-72 flex-col gap-2">
           {game.notices.map((notice) => (
             <div
               key={notice.id}
@@ -113,7 +113,14 @@ export function GameApp() {
             <Orchard state={state} />
           </div>
           <Separator className="bg-yellow-200/10" />
-          <StatsPanel state={state} stats={stats} now={game.now} onReset={game.reset} />
+          <StatsPanel
+            state={state}
+            stats={stats}
+            now={game.now}
+            onReset={game.reset}
+            onExport={game.exportSave}
+            onImport={game.importSave}
+          />
         </section>
 
         <aside className="hidden min-h-0 border-l border-yellow-200/10 px-4 py-6 lg:flex lg:max-h-dvh lg:flex-col">
