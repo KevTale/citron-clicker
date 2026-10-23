@@ -10,6 +10,7 @@ import {
   clickLemon,
   createInitialState,
   deriveStats,
+  isPlayableState,
   parseState,
   serializeState,
   tick,
@@ -196,6 +197,34 @@ export function useGame() {
     pushNotice("Le verger a été arraché. On recommence.");
   }, [pushNotice]);
 
+  const exportSave = useCallback(async () => {
+    const current = stateRef.current;
+    if (!current) return;
+    try {
+      await navigator.clipboard.writeText(serializeState({ ...current, lastSavedAt: Date.now() }));
+      pushNotice("Sauvegarde copiée dans le presse-papiers.");
+    } catch {
+      pushNotice("Impossible de copier la sauvegarde.");
+    }
+  }, [pushNotice]);
+
+  const importSave = useCallback(
+    (text: string) => {
+      const imported = parseState(text.trim());
+      if (!imported || !isPlayableState(imported)) {
+        pushNotice("Sauvegarde invalide : rien n’a changé.");
+        return false;
+      }
+      const next = { ...imported, lastSavedAt: Date.now() };
+      stateRef.current = next;
+      setState(next);
+      window.localStorage.setItem(SAVE_KEY, serializeState(next));
+      pushNotice("Sauvegarde importée.");
+      return true;
+    },
+    [pushNotice],
+  );
+
   return {
     state,
     stats,
@@ -209,5 +238,7 @@ export function useGame() {
     onBuyUpgrade,
     onGolden,
     reset,
+    exportSave,
+    importSave,
   };
 }
